@@ -1,6 +1,6 @@
 module scraper-go
 
-go 1.18
+go 1.19
 
 require (
 	github.com/chromedp/cdproto v0.0.0-20220816211547-b8b15824df23
