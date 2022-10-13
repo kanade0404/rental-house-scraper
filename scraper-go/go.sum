@@ -22,6 +22,8 @@ github.com/chromedp/chromedp v0.8.4 h1:50NSLCXC38kGsCmLCi8tXZ5V5FtQ3BOV/90u1O06G
 github.com/chromedp/chromedp v0.8.4/go.mod h1:ikuiJrEMoOnTPFUBu6jV0XZFOGW6W/Nhgk/OZyvh00o=
 github.com/chromedp/chromedp v0.8.5 h1:HAVg54yQFcn7sg5reVjXtoI1eQaFxhjAjflHACicUFw=
 github.com/chromedp/chromedp v0.8.5/go.mod h1:xal2XY5Di7m/bzlGwtoYpmgIOfDqCakOIVg5OfdkPZ4=
+github.com/chromedp/chromedp v0.8.6 h1:KobeeqR2dpfKSG1prS3Y6+FbffMmGC6xmAobRXA9QEQ=
+github.com/chromedp/chromedp v0.8.6/go.mod h1:nBYHoD6YSNzrr82cIeuOzhw1Jo/s2o0QQ+ifTeoCZ+c=
 github.com/chromedp/sysutil v1.0.0 h1:+ZxhTpfpZlmchB58ih/LBHX52ky7w2VhQVKQMucy3Ic=
 github.com/chromedp/sysutil v1.0.0/go.mod h1:kgWmDdq8fTzXYcKIBqIYvRRTnYb9aNS9moAV0xufSww=
 github.com/deckarep/golang-set v1.8.0 h1:sk9/l/KqpunDwP7pSjUg0keiOOLEnOBHzykLrsPppp4=
@@ -44,3 +46,5 @@ golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab h1:2QkjZIsXupsJbJIdSjjUOgWK3
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 h1:UiNENfZ8gDvpiWw7IpOMQ27spWmThO1RwwdQVbJahJM=
 golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec h1:BkDtF2Ih9xZ7le9ndzTA7KJow28VbQW3odyk/8drmuI=
+golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
