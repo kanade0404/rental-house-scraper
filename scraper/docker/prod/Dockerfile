@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:19
 WORKDIR /api
 RUN apt update && \
     apt install -y wget gnupg ca-certificates procps libxss1 && \
