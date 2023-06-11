@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: postgres:15.2
+    image: postgres:15.3
     container_name: scraper-postgres
     volumes:
       - ./database/data:/var/lib/postgresql/data
