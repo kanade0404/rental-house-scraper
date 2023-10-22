@@ -1,0 +1,25 @@
+version: '3'
+
+dotenv:
+  - .env
+
+tasks:
+  # データベースのマイグレーションをします
+  migration:
+    cmds:
+      - psqldef -U $DB_USER -W $DB_PASS -p $DB_PORT $DB_NAME < database/migrations/create_table.sql
+  # task migrationのdry-runをします
+  dry-migration:
+    cmds:
+      - psqldef -U $DB_USER -W $DB_PASS -p $DB_PORT $DB_NAME --dry-run < database/migrations/create_table.sql
+  # domains/models以下のファイルを削除してから、domains/models以下のファイルをデータベースの定義から生成します
+  generate:
+    cmds:
+      - docker run --rm -v $(pwd):/src -w /src sqlc/sqlc generate
+  test:
+    cmds:
+      - go test ./...
+  # coverageを開く
+  coverage:
+    cmds:
+      - go tool cover -html=cover.out

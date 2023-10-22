@@ -1,0 +1,18 @@
+version: "2"
+sql:
+  - queries:
+      - "internal/domains/queries/house"
+      - "internal/domains/queries/house/access"
+      - "internal/domains/queries/house/room"
+      - "internal/domains/queries/house/room/equipment"
+      - "internal/domains/queries/house/room/floor_plan"
+    schema: "database/migrations/create_table.sql"
+    gen:
+      go:
+        package: "domains"
+        out: "internal/domains"
+    engine: "postgresql"
+    database:
+      uri: "postgresql://postgres:secret@localhost:5432/postgres"
+    rules:
+      - sqlc/db-prepare

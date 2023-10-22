@@ -1,0 +1,15 @@
+{
+  "name": "rental-house-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "format": "sql-formatter --fix -l postgresql ./database/migrations/*.sql"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sql-formatter": "^13.0.0"
+  }
+}
