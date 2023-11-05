@@ -2,6 +2,7 @@ package access
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -37,8 +38,6 @@ func ParseAccess(accessText string) ([]Access, error) {
 	var parsedAccesses []Access
 	for i := range accesses {
 		var (
-			walk        TimeInMinutes
-			bus         *TimeInMinutes
 			trainName   string
 			stationName string
 		)
@@ -48,33 +47,24 @@ func ParseAccess(accessText string) ([]Access, error) {
 		// JR中央線「吉祥寺」駅バス11分 徒歩6～8分→JR中央線,吉祥寺,バス,11,徒歩,6
 		// JR中央線「武蔵境」駅 徒歩20～22分 またはバス5分 徒歩1～4分→JR中央線,武蔵境,徒歩,20 JR中央線,武蔵境,バス,5,徒歩,1
 
-		ac := strings.Split(accesses[i], " ")
-		if len(ac) < 2 {
-			return nil, fmt.Errorf(fmt.Sprintf("access is invalid. splitted result must be 2, got %d. %s", len(ac), accesses[i]))
+		accesses := strings.Split(accesses[i], " ")
+		if len(accesses) < 2 {
+			return nil, fmt.Errorf(fmt.Sprintf("access is invalid. splitted result must be 2, got %d. %s", len(accesses), accesses[i]))
 		}
 		// 徒歩での所要時間をparse
-		if !strings.Contains(ac[1], "徒歩") {
+		if !strings.Contains(accesses[1], "徒歩") {
 			return nil, fmt.Errorf("access is invalid. '徒歩' not found. %s", accesses[i])
 		}
-		//walkInMinutes := strings.Split(strings.ReplaceAll(strings.ReplaceAll(ac[1], "徒歩", ""), "分", ""), "～")
-		//if walkInTime, err := strconv.Atoi(walkInMinutes[0]); err != nil {
-		//	return nil, fmt.Errorf("access is invalid. failed to parse walk in minutes. %s", walkInMinutes[0])
-		//} else {
-		//	walk = TimeInMinutes{
-		//		minutes:        walkInTime,
-		//		movementMethod: "徒歩",
-		//	}
-		//}
-		walkInMinutes, err := parseWalk(ac[1])
+		walkInMinutes, err := parseWalk(accesses[1])
 		if err != nil {
 			return nil, err
 		}
-		walk = TimeInMinutes{
+		walk := TimeInMinutes{
 			minutes:        walkInMinutes,
 			movementMethod: "徒歩",
 		}
 		// 路線名と駅名+バスでの所要時間をparse
-		trainNameAndOthers := strings.Split(ac[0], "「")
+		trainNameAndOthers := strings.Split(accesses[0], "「")
 		if len(trainNameAndOthers) != 2 {
 			return nil, fmt.Errorf("access is invalid. splitted result must be 2, got %d. %s", len(trainNameAndOthers), accesses[i])
 		}
@@ -84,51 +74,65 @@ func ParseAccess(accessText string) ([]Access, error) {
 			return nil, fmt.Errorf("access is invalid. splitted result must be 2, got %d. %s", len(stationNameAndOther), accesses[i])
 		}
 		stationName = stationNameAndOther[0]
+		access := Access{
+			trainName:   trainName,
+			stationName: stationName,
+			walk:        walk,
+		}
 		// 駅名とバスでの所要時間をparser
 		// バスでの所要時間をparse
 		if strings.Contains(stationNameAndOther[1], "バス") {
-			//busInMinutes := strings.ReplaceAll(strings.ReplaceAll(stationNameAndOther[1], "バス", ""), "分", "")
-			//if busInTime, err := strconv.Atoi(busInMinutes); err != nil {
-			//	return nil, fmt.Errorf("access is invalid.  failed to parse bus in minutes. %s", busInMinutes)
-			//} else {
-			//	bus = &TimeInMinutes{
-			//		minutes:        busInTime,
-			//		movementMethod: "バス",
-			//	}
-			//}
 			busInMinutes, err := parseBus(stationNameAndOther[1])
 			if err != nil {
 				return nil, err
 			}
-			bus = &TimeInMinutes{
+			access.bus = &TimeInMinutes{
 				minutes:        busInMinutes,
 				movementMethod: "バス",
 			}
 		}
-		if len(ac) > 2 {
-			// またはバス5分 徒歩1～4分→JR中央線,武蔵境,バス,5,徒歩,1
-			if strings.Contains(ac[3], "バス") {
-				busInMinutes := strings.Split(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(ac[3], "バス", ""), "分", ""), "または", ""), "～")
-				if busInTime, err := strconv.Atoi(busInMinutes[0]); err != nil {
-					return nil, fmt.Errorf("access is invalid.  failed to parse bus in minutes. %s", busInMinutes[0])
-				} else {
-					bus = &TimeInMinutes{
-						minutes:        busInTime,
-						movementMethod: "バス",
+		parsedAccesses = append(parsedAccesses, access)
+		if len(accesses) > 2 {
+			var (
+				walk TimeInMinutes
+				bus  *TimeInMinutes
+			)
+			for i := range accesses[2:] {
+				access := accesses[2+i]
+				if strings.Contains(access, "バス") {
+					// またはバス5分 徒歩1～4分→JR中央線,武蔵境,バス,5,徒歩,1
+					re := regexp.MustCompile("バス|分|または")
+					busInMinutes := strings.Split(re.ReplaceAllString(access, ""), "～")
+					if busInTime, err := strconv.Atoi(busInMinutes[0]); err != nil {
+						return nil, fmt.Errorf("access is invalid.  failed to parse bus in minutes. %s", busInMinutes[0])
+					} else {
+						bus = &TimeInMinutes{
+							minutes:        busInTime,
+							movementMethod: "バス",
+						}
+					}
+				}
+				if strings.Contains(access, "徒歩") {
+					// またはバス5分 徒歩1～4分→JR中央線,武蔵境,バス,5,徒歩,1
+					re := regexp.MustCompile("徒歩|分|または")
+					walkInMinutes := strings.Split(re.ReplaceAllString(access, ""), "～")
+					if walkInTime, err := strconv.Atoi(walkInMinutes[0]); err != nil {
+						return nil, fmt.Errorf("access is invalid.  failed to parse walk in minutes. %s", walkInMinutes[0])
+					} else {
+						walk = TimeInMinutes{
+							minutes:        walkInTime,
+							movementMethod: "徒歩",
+						}
 					}
 				}
 			}
 			parsedAccesses = append(parsedAccesses, Access{
 				trainName:   trainName,
 				stationName: stationName,
+				walk:        walk,
+				bus:         bus,
 			})
 		}
-		parsedAccesses = append(parsedAccesses, Access{
-			trainName:   trainName,
-			stationName: stationName,
-			walk:        walk,
-			bus:         bus,
-		})
 	}
 	return parsedAccesses, nil
 }

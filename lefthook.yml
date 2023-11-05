@@ -14,16 +14,10 @@
    commands:
      gofmt:
        glob: "*.go"
-       run: |
-         for file in {staged_files}; do
-           go fmt $file
-         done
+       run: go fmt {staged_files}
      govet:
        glob: "*.go"
-       run: |
-         for file in {staged_files}; do
-           go vet $file
-         done
+       run: go vet {staged_files}
      actionlint:
        glob: ".github/workflows/*.yml"
        run: |

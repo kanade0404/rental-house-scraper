@@ -2,6 +2,8 @@ package access
 
 import (
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"strings"
 	"testing"
 )
 
@@ -64,20 +66,20 @@ func TestParseAccess(t *testing.T) {
 				{
 					trainName:   "JR中央線",
 					stationName: "武蔵境",
-					bus: &TimeInMinutes{
-						minutes:        5,
-						movementMethod: "バス",
-					},
 					walk: TimeInMinutes{
-						minutes:        1,
+						minutes:        20,
 						movementMethod: "徒歩",
 					},
 				},
 				{
 					trainName:   "JR中央線",
 					stationName: "武蔵境",
+					bus: &TimeInMinutes{
+						minutes:        5,
+						movementMethod: "バス",
+					},
 					walk: TimeInMinutes{
-						minutes:        20,
+						minutes:        1,
 						movementMethod: "徒歩",
 					},
 				},
@@ -143,7 +145,13 @@ func TestParseAccess(t *testing.T) {
 				t.Errorf("ParseAccess() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if diff := cmp.Diff(got, tt.want, cmp.AllowUnexported(Access{}, TimeInMinutes{})); diff != "" {
+			opts := []cmp.Option{
+				cmpopts.SortSlices(func(i, j int) bool {
+					return strings.Compare(got[i].trainName, got[j].trainName) > 0
+				}),
+				cmp.AllowUnexported(Access{}, TimeInMinutes{}),
+			}
+			if diff := cmp.Diff(got, tt.want, opts...); diff != "" {
 				t.Errorf("(-got+want)\n%s", diff)
 			}
 		})
